@@ -163,15 +163,16 @@
       <span class="val" id="spacingVal">30 cm</span>
     </div>
     <input type="range" id="spacingSlider" min="15" max="45" value="30" step="5" style="width:100%;margin-bottom:2px;">
-    <div class="row">
-      <label style="font-size:10.5px;">Décorations libres (rochers, ossements…)</label>
-      <input type="checkbox" id="decorToggle" checked>
-    </div>
   </div>
 
   <div class="card">
     <h2>Types de décors autorisés</h2>
     <div class="types" id="typesList"></div>
+    <div class="type-row" style="margin-top:4px;padding-top:8px;border-top:1px dashed var(--brass-dark);">
+      <input type="checkbox" id="decorToggle">
+      <span class="glyph">🪨</span>
+      <span class="name">Décorations libres (rochers, ossements…)</span>
+    </div>
   </div>
 
   <div class="actions">
@@ -247,7 +248,7 @@ const RULE_UNIT_CM = 30; // équivalent des 12" de la règle officielle
 const el = id => document.getElementById(id);
 const svgNS = 'http://www.w3.org/2000/svg';
 
-let state = { W:180, H:120, spacing:30, count:6, decor:true, placed:[] };
+let state = { W:180, H:120, spacing:30, count:6, decor:false, placed:[] };
 
 // ---- build type checkboxes ----
 const typesListEl = el('typesList');
