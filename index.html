@@ -113,6 +113,20 @@
   .legend-item .glyph{width:16px;text-align:center;}
   .legend-item .count{margin-left:auto;color:var(--ink-soft);}
 
+  .rules{display:flex;flex-direction:column;gap:6px;}
+  .rules details{
+    border:1px solid var(--brass-dark);border-radius:2px;background:var(--parchment);
+    padding:8px 10px;
+  }
+  .rules summary{
+    font-size:12px;font-weight:600;cursor:pointer;list-style:none;
+    display:flex;align-items:center;gap:6px;
+  }
+  .rules summary::-webkit-details-marker{display:none;}
+  .rules summary::after{content:"+";margin-left:auto;color:var(--brass-dark);font-weight:700;}
+  .rules details[open] summary::after{content:"–";}
+  .rules p{font-size:11px;color:var(--ink-soft);line-height:1.5;margin:8px 0 0;}
+
   footer{font-size:10px;color:var(--ink-soft);text-align:center;margin-top:8px;line-height:1.5;}
 </style>
 </head>
@@ -129,11 +143,11 @@
     <div class="presets" id="presets"></div>
     <div class="row" style="margin-top:10px;">
       <label>Longueur (largeur)</label>
-      <input type="number" id="tableW" value="72" min="24" max="120" step="6"> po
+      <input type="number" id="tableW" value="180" min="60" max="300" step="10"> cm
     </div>
     <div class="row">
       <label>Profondeur</label>
-      <input type="number" id="tableH" value="48" min="24" max="120" step="6"> po
+      <input type="number" id="tableH" value="120" min="60" max="300" step="10"> cm
     </div>
   </div>
 
@@ -143,12 +157,12 @@
       <label>Nombre de décors</label>
       <span class="val" id="countVal">6 / 6</span>
     </div>
-    <input type="range" id="countSlider" min="0" max="6" value="6" style="width:100%;margin-bottom:10px;">
+    <input type="range" id="countSlider" min="0" max="12" value="6" style="width:100%;margin-bottom:10px;">
     <div class="row">
       <label>Espacement min. entre décors</label>
-      <span class="val" id="spacingVal">12"</span>
+      <span class="val" id="spacingVal">30 cm</span>
     </div>
-    <input type="range" id="spacingSlider" min="6" max="18" value="12" style="width:100%;margin-bottom:2px;">
+    <input type="range" id="spacingSlider" min="15" max="45" value="30" step="5" style="width:100%;margin-bottom:2px;">
     <div class="row">
       <label style="font-size:10.5px;">Décorations libres (rochers, ossements…)</label>
       <input type="checkbox" id="decorToggle" checked>
@@ -177,29 +191,63 @@
     <div class="legend" id="legendList"></div>
   </div>
 
+  <div class="card">
+    <h2>Aide-mémoire des règles de décors</h2>
+    <div class="rules">
+      <details>
+        <summary>🌲 Forêt / Bois</summary>
+        <p>Terrain difficile : -1 au mouvement et jet de charge au plus faible des deux D6 pour les unités qui la traversent. Bloque la ligne de vue comme un obstacle de hauteur infinie (empêche de tirer par-dessus depuis une colline). Une unité entièrement à l'intérieur bénéficie d'un couvert.</p>
+      </details>
+      <details>
+        <summary>⛰ Colline</summary>
+        <p>Donne de la hauteur : une unité positionnée dessus peut voir et tirer par-dessus les troupes situées plus bas. Peut elle-même bloquer la ligne de vue au-delà de sa crête. Un versant rocailleux peut être désigné terrain difficile, voire dangereux.</p>
+      </details>
+      <details>
+        <summary>🏚 Bâtiment / Ruines</summary>
+        <p>Normalement infranchissable. Par accord entre joueurs, un bâtiment d'au moins 4" (~10 cm) de large peut être occupé par une unité d'infanterie de Force d'unité 20 maximum. La moitié des occupants peut tirer. L'unité occupante bénéficie d'un couvert total contre les tirs ; un gabarit la touche sur 5+ au lieu de 4+ ; un coup de canon inflige D3 touches de Force 4, PA -1.</p>
+      </details>
+      <details>
+        <summary>▬ Obstacle linéaire</summary>
+        <p>S'il est défendu, il empêche l'adversaire d'entrer en contact socle à socle : les assaillants sont limités à une seule attaque chacun et ne portent ni coup de charge ni écrasement. Non défendu, il compte comme terrain difficile à franchir.</p>
+      </details>
+      <details>
+        <summary>〜 Terrain impassable</summary>
+        <p>Infranchissable pour toutes les unités, quel que soit leur type (lac profond, ravin, ruines effondrées…).</p>
+      </details>
+      <details>
+        <summary>⚠ Terrain dangereux</summary>
+        <p>Ralentit comme un terrain difficile. Chaque socle qui commence, traverse ou termine son mouvement dedans doit réussir un test sur D6 : sur un résultat de 1, il subit une blessure.</p>
+      </details>
+    </div>
+  </div>
+
   <footer>
-    Règle appliquée : ~1 décor / 12" du plus grand côté de table, aucun décor à moins de 12" du centre,
-    et espacement minimum réglable entre chaque décor — d'après les règles de placement du livre de règles.
-    Le nombre suggéré n'est qu'un maximum indicatif : libre à vous de jouer une table plus dégagée.
+    Règle appliquée : ~1 décor / 30 cm du plus grand côté de table (équivalent à la règle des 12"),
+    aucun décor à moins de 30 cm du centre, et espacement minimum réglable entre chaque décor —
+    d'après les règles de placement du livre de règles. Le nombre suggéré n'est qu'un maximum indicatif :
+    libre à vous de jouer une table plus dégagée, jusqu'à 12 décors au total.
   </footer>
 
 </div>
 
 <script>
+// Tailles en cm — calibrées sur des décors réels (une forêt fait souvent
+// 30-45 cm de diamètre sur table, pas une simple pastille).
 const TERRAIN_TYPES = [
-  { id:'foret',      label:'Forêt / Bois',           color:'#3f5a3d', glyph:'🌲', weight:28, sizeRange:[4,8],  shape:'blob' },
-  { id:'colline',    label:'Colline',                color:'#8a6d3b', glyph:'⛰',  weight:18, sizeRange:[4,7],  shape:'blob' },
-  { id:'batiment',   label:'Bâtiment / Ruines',       color:'#6b6b63', glyph:'🏚',  weight:18, sizeRange:[3,5],  shape:'rect' },
-  { id:'obstacle',   label:'Obstacle linéaire',       color:'#5c6b4a', glyph:'▬',  weight:14, sizeRange:[6,12], shape:'line' },
-  { id:'impassable', label:'Impassable (eau/marais)', color:'#2c5470', glyph:'〜', weight:12, sizeRange:[4,8],  shape:'blob' },
-  { id:'dangereux',  label:'Terrain dangereux',       color:'#6a3b6a', glyph:'⚠',  weight:10, sizeRange:[4,7],  shape:'blob' },
+  { id:'foret',      label:'Forêt / Bois',           color:'#3f5a3d', glyph:'🌲', weight:28, sizeRange:[28,48], shape:'blob' },
+  { id:'colline',    label:'Colline',                color:'#8a6d3b', glyph:'⛰',  weight:18, sizeRange:[22,36], shape:'blob' },
+  { id:'batiment',   label:'Bâtiment / Ruines',       color:'#6b6b63', glyph:'🏚',  weight:18, sizeRange:[18,30], shape:'rect' },
+  { id:'obstacle',   label:'Obstacle linéaire',       color:'#5c6b4a', glyph:'▬',  weight:14, sizeRange:[30,60], shape:'line' },
+  { id:'impassable', label:'Impassable (eau/marais)', color:'#2c5470', glyph:'〜', weight:12, sizeRange:[25,42], shape:'blob' },
+  { id:'dangereux',  label:'Terrain dangereux',       color:'#6a3b6a', glyph:'⚠',  weight:10, sizeRange:[22,36], shape:'blob' },
 ];
 const DECOR_GLYPHS = ['🪨','🦴','🪵','🌿'];
+const RULE_UNIT_CM = 30; // équivalent des 12" de la règle officielle
 
 const el = id => document.getElementById(id);
 const svgNS = 'http://www.w3.org/2000/svg';
 
-let state = { W:72, H:48, spacing:12, count:6, decor:true, placed:[] };
+let state = { W:180, H:120, spacing:30, count:6, decor:true, placed:[] };
 
 // ---- build type checkboxes ----
 const typesListEl = el('typesList');
@@ -215,11 +263,10 @@ TERRAIN_TYPES.forEach(t=>{
 
 // ---- presets ----
 const PRESETS = [
-  {label:'4×4 pi', w:48, h:48},
-  {label:'4×6 pi', w:72, h:48},
-  {label:'6×4 pi', w:72, h:48},
-  {label:'4×8 pi', w:96, h:48},
-  {label:'6×6 pi', w:72, h:72},
+  {label:'4×4 pi', w:120, h:120},
+  {label:'6×4 pi', w:180, h:120},
+  {label:'8×4 pi', w:240, h:120},
+  {label:'6×6 pi', w:180, h:180},
 ];
 const presetsEl = el('presets');
 PRESETS.forEach(p=>{
@@ -229,17 +276,17 @@ PRESETS.forEach(p=>{
   presetsEl.appendChild(b);
 });
 
-function recommendedCount(W,H){ return Math.ceil(Math.max(W,H)/12); }
+function recommendedCount(W,H){ return Math.ceil(Math.max(W,H)/RULE_UNIT_CM); }
 
 function syncTable(){
-  state.W = Math.max(24, parseInt(el('tableW').value)||72);
-  state.H = Math.max(24, parseInt(el('tableH').value)||48);
+  state.W = Math.max(60, parseInt(el('tableW').value)||180);
+  state.H = Math.max(60, parseInt(el('tableH').value)||120);
   const rec = recommendedCount(state.W, state.H);
   const slider = el('countSlider');
-  slider.max = rec;
-  if(parseInt(slider.value) > rec || slider.dataset.userSet !== '1') slider.value = rec;
+  slider.max = Math.max(rec, 12);
+  if(slider.dataset.userSet !== '1') slider.value = rec;
   state.count = parseInt(slider.value);
-  el('countVal').textContent = `${state.count} / ${rec}`;
+  el('countVal').textContent = `${state.count} / ${rec} conseillés (max 12)`;
   drawEmptyBoard();
 }
 
@@ -249,11 +296,11 @@ el('countSlider').addEventListener('input', e=>{
   e.target.dataset.userSet='1';
   state.count = parseInt(e.target.value);
   const rec = recommendedCount(state.W, state.H);
-  el('countVal').textContent = `${state.count} / ${rec}`;
+  el('countVal').textContent = `${state.count} / ${rec} conseillés (max 12)`;
 });
 el('spacingSlider').addEventListener('input', e=>{
   state.spacing = parseInt(e.target.value);
-  el('spacingVal').textContent = state.spacing + '"';
+  el('spacingVal').textContent = state.spacing + ' cm';
 });
 el('decorToggle').addEventListener('change', e=> state.decor = e.target.checked);
 
@@ -283,11 +330,11 @@ function generate(){
       for(let attempt=0; attempt<300 && !ok; attempt++){
         const t = weightedPick(types);
         const size = t.sizeRange[0] + Math.random()*(t.sizeRange[1]-t.sizeRange[0]);
-        const radius = t.shape==='line' ? size/2 : size/2 + 0.5;
+        const radius = t.shape==='line' ? size/2 : size/2 + 1;
         const x = radius + Math.random()*(state.W - 2*radius);
         const y = radius + Math.random()*(state.H - 2*radius);
         const pt = {x,y};
-        if(dist(pt,{x:cx,y:cy}) < 12 + radius) continue;
+        if(dist(pt,{x:cx,y:cy}) < RULE_UNIT_CM + radius) continue;
         let clash=false;
         for(const p of placed){ if(dist(pt,p) < p.radius+radius+state.spacing){ clash=true; break; } }
         if(clash) continue;
@@ -323,38 +370,38 @@ function render(){
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.innerHTML='';
 
-  // felt background + grid every 12"
+  // felt background + grid every 30cm (12")
   const bg = document.createElementNS(svgNS,'rect');
   bg.setAttribute('x',0); bg.setAttribute('y',0); bg.setAttribute('width',W); bg.setAttribute('height',H);
   bg.setAttribute('fill','#26332B');
   svg.appendChild(bg);
 
-  for(let gx=12; gx<W; gx+=12){
+  for(let gx=RULE_UNIT_CM; gx<W; gx+=RULE_UNIT_CM){
     const l=document.createElementNS(svgNS,'line');
     l.setAttribute('x1',gx); l.setAttribute('y1',0); l.setAttribute('x2',gx); l.setAttribute('y2',H);
     l.setAttribute('stroke','#1E2822'); l.setAttribute('stroke-width',0.25);
     svg.appendChild(l);
   }
-  for(let gy=12; gy<H; gy+=12){
+  for(let gy=RULE_UNIT_CM; gy<H; gy+=RULE_UNIT_CM){
     const l=document.createElementNS(svgNS,'line');
     l.setAttribute('x1',0); l.setAttribute('y1',gy); l.setAttribute('x2',W); l.setAttribute('y2',gy);
     l.setAttribute('stroke','#1E2822'); l.setAttribute('stroke-width',0.25);
     svg.appendChild(l);
   }
 
-  // deployment zone hint lines (12" from short edges) — purely visual reference
-  [12, W-12].forEach(dx=>{
+  // deployment zone hint lines (30cm from short edges) — purely visual reference
+  [RULE_UNIT_CM, W-RULE_UNIT_CM].forEach(dx=>{
     const l=document.createElementNS(svgNS,'line');
     l.setAttribute('x1',dx); l.setAttribute('y1',0); l.setAttribute('x2',dx); l.setAttribute('y2',H);
     l.setAttribute('stroke','#B08D3E'); l.setAttribute('stroke-width',0.3); l.setAttribute('stroke-dasharray','2,2'); l.setAttribute('opacity',0.5);
     svg.appendChild(l);
   });
 
-  // center exclusion ring (12")
+  // center exclusion ring (30cm)
   const ring = document.createElementNS(svgNS,'circle');
-  ring.setAttribute('cx',W/2); ring.setAttribute('cy',H/2); ring.setAttribute('r',12);
-  ring.setAttribute('fill','none'); ring.setAttribute('stroke','#B08D3E'); ring.setAttribute('stroke-width',0.25);
-  ring.setAttribute('stroke-dasharray','1.5,1.5'); ring.setAttribute('opacity',0.4);
+  ring.setAttribute('cx',W/2); ring.setAttribute('cy',H/2); ring.setAttribute('r',RULE_UNIT_CM);
+  ring.setAttribute('fill','none'); ring.setAttribute('stroke','#B08D3E'); ring.setAttribute('stroke-width',0.6);
+  ring.setAttribute('stroke-dasharray','2.5,2.5'); ring.setAttribute('opacity',0.4);
   svg.appendChild(ring);
 
   // main terrain pieces
@@ -366,24 +413,24 @@ function render(){
       shape = document.createElementNS(svgNS,'rect');
       shape.setAttribute('x',-p.size/2); shape.setAttribute('y',-p.size*0.7/2);
       shape.setAttribute('width',p.size); shape.setAttribute('height',p.size*0.7);
-      shape.setAttribute('rx',0.4);
+      shape.setAttribute('rx',1);
     } else if(p.type.shape==='line'){
       shape = document.createElementNS(svgNS,'rect');
-      shape.setAttribute('x',-p.size/2); shape.setAttribute('y',-0.7);
-      shape.setAttribute('width',p.size); shape.setAttribute('height',1.4);
-      shape.setAttribute('rx',0.3);
+      shape.setAttribute('x',-p.size/2); shape.setAttribute('y',-2.5);
+      shape.setAttribute('width',p.size); shape.setAttribute('height',5);
+      shape.setAttribute('rx',0.8);
     } else {
       shape = document.createElementNS(svgNS,'ellipse');
       shape.setAttribute('rx',p.size/2); shape.setAttribute('ry',p.size/2*0.85);
     }
     shape.setAttribute('fill',p.type.color);
-    shape.setAttribute('stroke','#161810'); shape.setAttribute('stroke-width',0.3); shape.setAttribute('opacity',0.92);
+    shape.setAttribute('stroke','#161810'); shape.setAttribute('stroke-width',0.7); shape.setAttribute('opacity',0.92);
     g.appendChild(shape);
 
     const txt = document.createElementNS(svgNS,'text');
-    txt.setAttribute('x',0); txt.setAttribute('y',1.4);
+    txt.setAttribute('x',0); txt.setAttribute('y',3.5);
     txt.setAttribute('text-anchor','middle');
-    txt.setAttribute('font-size', Math.max(2.4, p.size*0.32));
+    txt.setAttribute('font-size', Math.max(6, p.size*0.32));
     txt.setAttribute('transform', `rotate(${-p.rot})`);
     txt.textContent = p.type.glyph;
     g.appendChild(txt);
@@ -394,24 +441,24 @@ function render(){
   (state.decorPlaced||[]).forEach(d=>{
     const txt = document.createElementNS(svgNS,'text');
     txt.setAttribute('x',d.x); txt.setAttribute('y',d.y);
-    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size',2.4); txt.setAttribute('opacity',0.75);
+    txt.setAttribute('text-anchor','middle'); txt.setAttribute('font-size',6); txt.setAttribute('opacity',0.75);
     txt.textContent = d.glyph;
     svg.appendChild(txt);
   });
 
   // border
   const border = document.createElementNS(svgNS,'rect');
-  border.setAttribute('x',0.15); border.setAttribute('y',0.15);
-  border.setAttribute('width',W-0.3); border.setAttribute('height',H-0.3);
-  border.setAttribute('fill','none'); border.setAttribute('stroke','#AD8A3C'); border.setAttribute('stroke-width',0.4);
+  border.setAttribute('x',0.4); border.setAttribute('y',0.4);
+  border.setAttribute('width',W-0.8); border.setAttribute('height',H-0.8);
+  border.setAttribute('fill','none'); border.setAttribute('stroke','#AD8A3C'); border.setAttribute('stroke-width',1);
   svg.appendChild(border);
 
   // status + legend
   const statusEl = el('statusLine');
   if(!state.placed.length && !state.decorPlaced?.length){
-    statusEl.innerHTML = 'Table de ' + W + '" × ' + H + '" — appuyez sur « Générer la carte »';
+    statusEl.innerHTML = 'Table de ' + W + '×' + H + ' cm — appuyez sur « Générer la carte »';
   } else {
-    statusEl.innerHTML = `Table ${W}"×${H}" — <b>${state.placed.length}</b> décor(s) placé(s)`
+    statusEl.innerHTML = `Table ${W}×${H} cm — <b>${state.placed.length}</b> décor(s) placé(s)`
       + (state.shortfall ? ` (${state.shortfall} non placé faute d'espace)` : '');
   }
 
