@@ -160,9 +160,9 @@
     <input type="range" id="countSlider" min="0" max="12" value="6" style="width:100%;margin-bottom:10px;">
     <div class="row">
       <label>Espacement min. entre décors</label>
-      <span class="val" id="spacingVal">30 cm</span>
+      <span class="val" id="spacingVal">15 cm</span>
     </div>
-    <input type="range" id="spacingSlider" min="15" max="45" value="30" step="5" style="width:100%;margin-bottom:2px;">
+    <input type="range" id="spacingSlider" min="0" max="30" value="15" step="5" style="width:100%;margin-bottom:2px;">
   </div>
 
   <div class="card">
@@ -224,9 +224,9 @@
 
   <footer>
     Règle appliquée : ~1 décor / 30 cm du plus grand côté de table (équivalent à la règle des 12"),
-    aucun décor à moins de 30 cm du centre, et espacement minimum réglable entre chaque décor —
-    d'après les règles de placement du livre de règles. Le nombre suggéré n'est qu'un maximum indicatif :
-    libre à vous de jouer une table plus dégagée, jusqu'à 12 décors au total.
+    avec un espacement minimum réglable entre chaque décor — d'après les règles de placement du livre de règles.
+    Le nombre suggéré n'est qu'un maximum indicatif : libre à vous de jouer une table plus dégagée,
+    jusqu'à 12 décors au total.
   </footer>
 
 </div>
@@ -248,7 +248,7 @@ const RULE_UNIT_CM = 30; // équivalent des 12" de la règle officielle
 const el = id => document.getElementById(id);
 const svgNS = 'http://www.w3.org/2000/svg';
 
-let state = { W:180, H:120, spacing:30, count:6, decor:false, placed:[] };
+let state = { W:180, H:120, spacing:15, count:6, decor:false, placed:[] };
 
 // ---- build type checkboxes ----
 const typesListEl = el('typesList');
@@ -322,7 +322,6 @@ function dist(a,b){ return Math.hypot(a.x-b.x, a.y-b.y); }
 function generate(){
   const types = enabledTypes();
   const placed = [];
-  const cx = state.W/2, cy = state.H/2;
   let shortfall = 0;
 
   if(types.length){
@@ -335,7 +334,6 @@ function generate(){
         const x = radius + Math.random()*(state.W - 2*radius);
         const y = radius + Math.random()*(state.H - 2*radius);
         const pt = {x,y};
-        if(dist(pt,{x:cx,y:cy}) < RULE_UNIT_CM + radius) continue;
         let clash=false;
         for(const p of placed){ if(dist(pt,p) < p.radius+radius+state.spacing){ clash=true; break; } }
         if(clash) continue;
@@ -399,12 +397,6 @@ function render(){
   });
 
   // center exclusion ring (30cm)
-  const ring = document.createElementNS(svgNS,'circle');
-  ring.setAttribute('cx',W/2); ring.setAttribute('cy',H/2); ring.setAttribute('r',RULE_UNIT_CM);
-  ring.setAttribute('fill','none'); ring.setAttribute('stroke','#B08D3E'); ring.setAttribute('stroke-width',0.6);
-  ring.setAttribute('stroke-dasharray','2.5,2.5'); ring.setAttribute('opacity',0.4);
-  svg.appendChild(ring);
-
   // main terrain pieces
   state.placed.forEach(p=>{
     const g = document.createElementNS(svgNS,'g');
